@@ -1,0 +1,169 @@
+{
+  "name": "restaurant-website-torimaru",
+  "version": "2.0.0",
+  "description": "飲食店ウェブサイト - MicroCMS連携、Vercel Functions使用（手動制御対応版）",
+  "type": "module",
+  "main": "js/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build step required'",
+    "start": "vercel dev",
+    "deploy": "vercel --prod",
+    "preview": "vercel",
+    "lint": "eslint js/**/*.js api/**/*.js",
+    "lint:fix": "eslint js/**/*.js api/**/*.js --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "test": "echo 'Tests not configured yet'",
+    "test:api": "node scripts/test-api.js",
+    "clean": "rm -rf .vercel dist node_modules/.cache",
+    "setup": "npm install && cp .env.example .env.local",
+    "validate": "npm run lint && npm run format:check",
+    "health-check": "node scripts/health-check.js",
+    "postinstall": "echo 'Setup complete. Please configure .env.local with your MicroCMS credentials.'"
+  },
+  "keywords": [
+    "restaurant",
+    "microcms",
+    "javascript",
+    "vercel",
+    "es6-modules",
+    "static-site",
+    "food-service",
+    "cms",
+    "business-hours",
+    "manual-control"
+  ],
+  "author": {
+    "name": "制作会社名",
+    "email": "contact@your-company.com",
+    "url": "https://your-company.com"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.7",
+    "eslint": "^8.50.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^3.0.3",
+    "vercel": "^32.4.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-company/restaurant-website-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-company/restaurant-website-template/issues"
+  },
+  "homepage": "https://github.com/your-company/restaurant-website-template#readme",
+  "funding": {
+    "type": "individual",
+    "url": "https://your-company.com/support"
+  },
+  "vercel": {
+    "functions": {
+      "api/**/*.js": {
+        "maxDuration": 10
+      }
+    },
+    "headers": [
+      {
+        "source": "/api/(.*)",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Access-Control-Allow-Methods",
+            "value": "GET, POST, PATCH, DELETE, OPTIONS"
+          },
+          {
+            "key": "Access-Control-Allow-Headers",
+            "value": "Content-Type, Authorization"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/api/news",
+        "destination": "/api/news.js"
+      },
+      {
+        "source": "/api/business-status",
+        "destination": "/api/business-status.js"
+      },
+      {
+        "source": "/api/business-status/(.*)",
+        "destination": "/api/business-status.js?id=$1"
+      }
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "standard"
+    ],
+    "env": {
+      "browser": true,
+      "es2022": true,
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "error",
+      "prefer-const": "error",
+      "no-var": "error"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "bracketSpacing": true,
+    "arrowParens": "avoid"
+  },
+  "files": [
+    "js/",
+    "api/",
+    "css/",
+    "index.html",
+    "README.md"
+  ],
+  "directories": {
+    "lib": "js",
+    "doc": "docs"
+  },
+  "config": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run validate",
+      "pre-push": "npm run test"
+    }
+  }
+}

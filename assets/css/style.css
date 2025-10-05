@@ -1,0 +1,1235 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --black: #1a1a1a;
+    --gold: #c9a961;
+    --white: #ffffff;
+    --gray: #666;
+    --light-gray: #f8f7f5;
+    --border: #e0e0e0;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --blue: #3498db;
+    --instagram: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: -apple-system, "游ゴシック体", YuGothic, "游ゴシック", sans-serif;
+    line-height: 1.7;
+    color: var(--black);
+    background: var(--white);
+    padding-bottom: calc(70px + var(--safe-area-inset-bottom));
+}
+
+/* リアルタイム営業状況バー（上部） */
+.status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    z-index: 2000;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.status-bar.visible {
+    transform: translateY(0);
+}
+
+.status-content {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--success);
+    color: white;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.closed {
+    background: var(--gray);
+}
+
+.status-badge.last-order {
+    background: var(--warning);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.status-detail {
+    font-size: 13px;
+    color: var(--gray);
+    display: none;
+}
+
+.status-action {
+    padding: 8px 20px;
+    background: var(--black);
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.status-action:hover {
+    background: var(--gold);
+    transform: translateY(-1px);
+}
+
+/* 新着情報バナー */
+.news-banner {
+    background: var(--gold);
+    color: var(--black);
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    display: none;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.news-banner.show {
+    display: block;
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+.news-banner:hover {
+    background: #b8954e;
+}
+
+.news-banner::before {
+    content: '🆕';
+    margin-right: 8px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+
+/* ヒーローセクション */
+.hero {
+    height: 100vh;
+    min-height: 600px;
+    position: relative;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    color: white;
+    padding: 20px;
+}
+
+.hero-title {
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 200;
+    letter-spacing: 0.3em;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1.2s forwards 0.5s;
+}
+
+.hero-subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    letter-spacing: 0.2em;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1.2s forwards 0.8s;
+    margin-bottom: 12px;
+}
+
+.hero-commitment {
+    font-size: clamp(12px, 1.5vw, 14px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1.2s forwards 0.9s;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-cta {
+    display: inline-block;
+    padding: 14px 40px;
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1.2s forwards 1.1s;
+}
+
+.hero-cta:hover {
+    background: white;
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.scroll-indicator:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+.scroll-indicator::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 4px;
+    height: 10px;
+    background: white;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    animation: scroll 2s infinite;
+}
+
+@keyframes scroll {
+    0% {
+        opacity: 0;
+        top: 10px;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        top: 25px;
+    }
+}
+
+/* 新着情報セクション */
+.news-section {
+    background: var(--white);
+    padding: 60px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.news-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.news-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.news-date {
+    font-size: 12px;
+    color: var(--gray);
+    background: var(--light-gray);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.news-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.news-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: var(--light-gray);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.news-item:hover {
+    background: #f0ede5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.news-badge {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    height: fit-content;
+}
+
+.news-badge.new {
+    background: var(--danger);
+}
+
+.news-badge.menu {
+    background: var(--success);
+}
+
+.news-badge.event {
+    background: var(--blue);
+}
+
+.news-badge.notice {
+    background: var(--warning);
+}
+
+.news-content {
+    flex: 1;
+}
+
+.news-item-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--black);
+}
+
+.news-item-text {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+/* ローディング・エラー状態 */
+.news-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: var(--gray);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--light-gray);
+    border-top: 2px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.news-error {
+    padding: 20px;
+    background: #ffeaea;
+    border-radius: 12px;
+    color: var(--danger);
+    text-align: center;
+}
+
+/* クイック情報セクション */
+.quick-info {
+    background: var(--light-gray);
+    padding: 60px 20px;
+}
+
+.quick-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.commitment-badges {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.commitment-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--black);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+}
+
+.commitment-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.commitment-icon {
+    font-size: 16px;
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.quick-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.quick-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.quick-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--light-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 24px;
+}
+
+.quick-label {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+.quick-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 4px;
+}
+
+.quick-note {
+    font-size: 13px;
+    color: var(--gray);
+}
+
+.allergen-note {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: help;
+}
+
+/* こだわりセクション */
+.commitment-section {
+    background: white;
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.commitment-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 60px;
+    background: var(--gold);
+    transform: translateX(-50%);
+}
+
+.commitment-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.commitment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+}
+
+.commitment-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.commitment-card-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--light-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.commitment-card-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.commitment-card:hover .commitment-card-icon {
+    transform: scale(1.1);
+}
+
+.commitment-card:hover .commitment-card-icon::after {
+    opacity: 1;
+}
+
+.commitment-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--black);
+}
+
+.commitment-card-description {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
+
+/* swiper  メニュースライダー専用スタイル */
+.top_menu {
+    position: relative;
+    padding: 80px 0;
+    background: var(--light-gray);
+    min-height: 700px;
+}
+
+.mySwiper {
+    width: 100%;
+    height: 600px;
+    position: relative;
+}
+
+.swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent;
+}
+
+/* swiper 背景のぼかし効果 */
+.slide-background {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    right: -50px;
+    bottom: -50px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) brightness(0.8);
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* swiper メニューカード */
+.menu-slide-card {
+    position: relative;
+    z-index: 10;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    max-width: 420px;
+    width: 85%;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+    opacity: 0.7;
+    transform: scale(0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.swiper-slide-active .menu-slide-card {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+}
+
+.menu-slide-image {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+}
+
+.menu-slide-content {
+    padding: 28px 24px 32px;
+    text-align: center;
+    background: white;
+}
+
+.menu-slide-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+}
+
+.menu-slide-price {
+    font-size: 20px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+}
+
+.menu-slide-description {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--gray);
+    text-align: left;
+}
+
+/* swiper ナビゲーションボタンのカスタマイズ */
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-button-prev {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    color: var(--black);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mySwiper .swiper-button-next:after,
+.mySwiper .swiper-button-prev:after {
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.mySwiper .swiper-button-next:hover,
+.mySwiper .swiper-button-prev:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* swiper ページネーションのカスタマイズ */
+.mySwiper .swiper-pagination {
+    bottom: 30px;
+    z-index: 20;
+}
+
+.mySwiper .swiper-pagination-bullet {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    opacity: 1;
+    margin: 0 6px;
+    transition: all 0.3s ease;
+}
+
+.mySwiper .swiper-pagination-bullet-active {
+    background: var(--gold);
+    width: 36px;
+    border-radius: 6px;
+}
+
+/* swiper レスポンシブ対応 */
+@media (max-width: 768px) {
+    .top_menu {
+        min-height: 600px;
+        padding: 60px 0;
+    }
+
+    .mySwiper {
+        height: 550px;
+    }
+
+    .menu-slide-card {
+        max-width: 340px;
+        width: 90%;
+    }
+
+    .menu-slide-image {
+        height: 240px;
+    }
+    
+    .menu-slide-content {
+        padding: 20px 18px 24px;
+    }
+    
+    .menu-slide-title {
+        font-size: 18px;
+    }
+    
+    .menu-slide-price {
+        font-size: 18px;
+    }
+    
+    .menu-slide-description {
+        font-size: 13px;
+        line-height: 1.7;
+    }
+    
+    .mySwiper .swiper-button-next,
+    .mySwiper .swiper-button-prev {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .mySwiper .swiper-button-next:after,
+    .mySwiper .swiper-button-prev:after {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mySwiper .swiper-button-next,
+    .mySwiper .swiper-button-prev {
+        display: none;
+    }
+}
+
+
+/* 予約セクション */
+.reservation-section {
+    background: var(--black);
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.reservation-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.reservation-title {
+    font-size: clamp(32px, 6vw, 48px);
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+}
+
+.reservation-subtitle {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 60px;
+}
+
+.reservation-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.reservation-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px 24px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.reservation-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-4px);
+}
+
+.reservation-card.popular::before {
+    content: '人気';
+    position: absolute;
+    top: -8px;
+    right: 16px;
+    background: var(--gold);
+    color: var(--black);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.reservation-icon {
+    font-size: 36px;
+    margin-bottom: 16px;
+}
+
+.reservation-method {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.reservation-detail {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.reservation-tel {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 16px 48px;
+    background: var(--gold);
+    color: var(--black);
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    transition: all 0.3s;
+}
+
+.reservation-tel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(201, 169, 97, 0.3);
+}
+
+.reservation-notes {
+    margin-top: 32px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.reservation-notes h4 {
+    margin-bottom: 8px;
+    color: var(--gold);
+}
+
+.reservation-notes ul {
+    list-style: none;
+    text-align: left;
+}
+
+.reservation-notes li {
+    margin-bottom: 4px;
+}
+
+.reservation-notes li::before {
+    content: '・';
+    margin-right: 8px;
+}
+
+/* フッター */
+.footer {
+    background: var(--light-gray);
+    padding: 60px 20px 40px;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    margin-bottom: 24px;
+}
+
+.footer-info {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.social-link {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--black);
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 20px;
+}
+
+.social-link:hover {
+    background: var(--black);
+    color: white;
+    border-color: var(--black);
+    transform: translateY(-2px);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+
+.footer-links a {
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--black);
+}
+
+.footer-copy {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.1em;
+}
+
+/* 下部固定ナビゲーション */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+    padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.nav-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 8px;
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 11px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.nav-item:active {
+    background: var(--light-gray);
+}
+
+.nav-item.active {
+    color: var(--black);
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 2px;
+    background: var(--gold);
+}
+
+.nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+/* トーストメッセージ */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--black);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* レスポンシブ対応 */
+@media (min-width: 768px) {
+    .status-detail {
+        display: inline;
+    }
+
+    .quick-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .commitment-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .news-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+
+    .bottom-nav {
+        display: none;
+    }
+
+    body {
+        padding-bottom: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .reservation-methods {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .commitment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .commitment-badges {
+        justify-content: flex-start;
+    }
+
+    .reviews-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .news-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .news-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .news-badge {
+        align-self: flex-start;
+    }
+}
+
+/* アクセシビリティ */
+:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* プリント用スタイル */
+@media print {
+
+    .status-bar,
+    .instagram-banner,
+    .news-banner,
+    .bottom-nav,
+    .hero,
+    .scroll-indicator {
+        display: none;
+    }
+
+    body {
+        padding-bottom: 0;
+    }
+
+    .section-title {
+        page-break-after: avoid;
+    }
+}
