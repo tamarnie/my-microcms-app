@@ -1,39 +1,30 @@
-// api/news.js - Vercel Functions用のニュース取得API
+// api/news.js - Vercel Functions用のニュース取得API（CORS設定改善版）
 
 /**
  * MicroCMS ニュースAPIのプロキシエンドポイント
- * セキュリティ: APIキーをサーバーサイドで管理
+ * セキュリティ: APIキーをサーバーサイドで管理 + CORS制限
  */
 export default async function handler(req, res) {
-    // CORS設定
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
-    
-    // プリフライトリクエスト対応
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    // GETリクエストのみ許可
-    if (req.method !== 'GET') {
-        return res.status(405).json({ 
-            error: 'Method not allowed',
-            message: 'このエンドポイントはGETリクエストのみ対応しています'
-        });
-    }
-
     try {
-        // 環境変数からAPIキーとエンドポイントを取得
-        const MICROCMS_API_KEY = process.env.MICROCMS_API_KEY;
-        const MICROCMS_SERVICE_DOMAIN = process.env.MICROCMS_SERVICE_DOMAIN;
+        // CORS設定（環境変数で制御）
+        const allowedOrigin = getAllowedOrigin(req);
+        setCorsHeaders(res, allowedOrigin);
         
-        // 環境変数の確認
-        if (!MICROCMS_API_KEY || !MICROCMS_SERVICE_DOMAIN) {
-            console.error('Environment variables not configured');
-            throw new Error('サーバー設定エラー');
+        // プリフライトリクエスト対応
+        if (req.method === 'OPTIONS') {
+            return res.status(200).end();
         }
+
+        // GETリクエストのみ許可
+        if (req.method !== 'GET') {
+            return res.status(405).json({ 
+                error: 'Method not allowed',
+                message: 'このエンドポイントはGETリクエストのみ対応しています'
+            });
+        }
+
+        // 環境変数チェック
+        const { apiKey, serviceDomain } = validateEnvironmentVariables();
 
         // クエリパラメータを取得・検証
         const { 
@@ -78,16 +69,15 @@ export default async function handler(req, res) {
             params.append('fields', fields);
         }
         
-        const apiUrl = `https://${MICROCMS_SERVICE_DOMAIN}.microcms.io/api/v1/news?${params}`;
+        const apiUrl = `https://${serviceDomain}.microcms.io/api/v1/news?${params}`;
         
         // MicroCMSにリクエスト
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                'X-MICROCMS-API-KEY': MICROCMS_API_KEY,
+                'X-MICROCMS-API-KEY': apiKey,
                 'Content-Type': 'application/json'
             },
-            // タイムアウト設定（10秒）
             signal: AbortSignal.timeout(10000)
         });
 
@@ -117,7 +107,7 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         
-        // データの後処理とセキュリティ
+        // データの後処理とセキュリティ（サニタイズ）
         const processedData = {
             contents: data.contents?.map(item => ({
                 id: item.id,
@@ -143,37 +133,75 @@ export default async function handler(req, res) {
         return res.status(200).json(processedData);
         
     } catch (error) {
-        console.error('News API Error:', error);
-        
-        // エラーレスポンス
-        const errorResponse = {
-            error: 'Failed to fetch news',
-            message: getErrorMessage(error),
-            timestamp: new Date().toISOString()
-        };
-        
-        // 開発環境では詳細なエラー情報を含める
-        if (process.env.NODE_ENV === 'development') {
-            errorResponse.details = error.message;
-            errorResponse.stack = error.stack;
-        }
-        
-        // エラーの種類に応じたステータスコード
-        let statusCode = 500;
-        if (error.message.includes('認証')) statusCode = 401;
-        if (error.message.includes('権限')) statusCode = 403;
-        if (error.message.includes('見つかりません')) statusCode = 404;
-        if (error.message.includes('制限')) statusCode = 429;
-        if (error.message.includes('設定')) statusCode = 500;
-        
-        return res.status(statusCode).json(errorResponse);
+        return handleError(error, req, res);
     }
 }
 
 /**
- * 文字列のサニタイズ
- * @param {string} str - サニタイズする文字列
- * @returns {string} サニタイズされた文字列
+ * 許可されたオリジンを取得
+ */
+function getAllowedOrigin(req) {
+    const requestOrigin = req.headers.origin;
+    const allowedOrigin = process.env.ALLOWED_ORIGIN;
+    
+    // 環境変数が設定されていない場合
+    if (!allowedOrigin) {
+        // 開発環境ではリクエスト元を許可
+        if (process.env.NODE_ENV === 'development') {
+            return requestOrigin || '*';
+        }
+        // 本番環境では警告を出すが、動作は継続
+        console.warn('⚠️ ALLOWED_ORIGIN環境変数が未設定です。セキュリティリスクがあります。');
+        return requestOrigin || '*';
+    }
+    
+    // カンマ区切りで複数ドメインに対応
+    const allowedOrigins = allowedOrigin.split(',').map(o => o.trim());
+    
+    // リクエスト元が許可リストに含まれているか確認
+    if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+        return requestOrigin;
+    }
+    
+    // デフォルトとして最初の許可オリジンを返す
+    return allowedOrigins[0];
+}
+
+/**
+ * CORSヘッダーを設定
+ */
+function setCorsHeaders(res, allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24時間
+    
+    // キャッシュ設定（ニュースは5分間キャッシュ可能）
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    
+    // セキュリティヘッダー
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+}
+
+/**
+ * 環境変数の検証
+ */
+function validateEnvironmentVariables() {
+    const apiKey = process.env.MICROCMS_API_KEY;
+    const serviceDomain = process.env.MICROCMS_SERVICE_DOMAIN;
+    
+    if (!apiKey || !serviceDomain) {
+        console.error('Environment variables not configured');
+        throw new Error('サーバー設定エラー');
+    }
+    
+    return { apiKey, serviceDomain };
+}
+
+/**
+ * 文字列のサニタイズ（XSS対策）
  */
 function sanitizeString(str) {
     if (typeof str !== 'string') return str;
@@ -192,9 +220,37 @@ function sanitizeString(str) {
 }
 
 /**
+ * エラーハンドリング
+ */
+function handleError(error, req, res) {
+    console.error('News API Error:', error);
+    
+    // エラーレスポンス
+    const errorResponse = {
+        error: 'Failed to fetch news',
+        message: getErrorMessage(error),
+        timestamp: new Date().toISOString()
+    };
+    
+    // 開発環境では詳細なエラー情報を含める
+    if (process.env.NODE_ENV === 'development') {
+        errorResponse.details = error.message;
+        errorResponse.stack = error.stack;
+    }
+    
+    // エラーの種類に応じたステータスコード
+    let statusCode = 500;
+    if (error.message.includes('認証')) statusCode = 401;
+    if (error.message.includes('権限')) statusCode = 403;
+    if (error.message.includes('見つかりません')) statusCode = 404;
+    if (error.message.includes('制限')) statusCode = 429;
+    if (error.message.includes('設定')) statusCode = 500;
+    
+    return res.status(statusCode).json(errorResponse);
+}
+
+/**
  * エラーメッセージの取得
- * @param {Error} error - エラーオブジェクト
- * @returns {string} ユーザー向けエラーメッセージ
  */
 function getErrorMessage(error) {
     const message = error.message || 'Unknown error';
@@ -218,20 +274,4 @@ function getErrorMessage(error) {
     
     // デフォルトメッセージ
     return 'データの取得に失敗しました。しばらくしてから再度お試しください';
-}
-
-/**
- * リクエストのログ出力（デバッグ用）
- * @param {Object} req - リクエストオブジェクト
- */
-function logRequest(req) {
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`📰 News API Request:`, {
-            method: req.method,
-            query: req.query,
-            userAgent: req.headers['user-agent'],
-            ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-            timestamp: new Date().toISOString()
-        });
-    }
 }
