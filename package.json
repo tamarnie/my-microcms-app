@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "mkdir -p dist && cp index.html dist/ && cp -r public/* dist/ && mkdir -p dist/api && cp -r api/* dist/api/",
+    "build": "mkdir -p dist && cp index.html dist/ && cp -r public/* dist/",
     "deploy": "vercel --prod",
     "health-check": "node scripts/health-check.js"
   },
