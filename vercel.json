@@ -4,10 +4,15 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10
+      "maxDuration": 10,
+      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/js/(.*)",
       "destination": "/js/$1"
