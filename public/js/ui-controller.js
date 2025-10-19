@@ -231,6 +231,7 @@ export class UIController {
     updateScrollState() {
         const currentScrollY = window.pageYOffset;
         const statusBar = utils.getElementById('statusBar');
+        const newsBanner = utils.getElementById('newsBanner');
 
         // スクロール方向を検出
         this.scrollDirection = currentScrollY > this.lastScrollY ? 'down' : 'up';
