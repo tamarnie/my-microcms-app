@@ -238,7 +238,7 @@ export class UIController {
 
         // ステータスバーの表示制御
         if (statusBar) {
-            const shouldShow = currentScrollY > true;  //常に表示
+            const shouldShow = currentScrollY = true;  //常に表示
             statusBar.classList.toggle('visible', shouldShow);
         }
 
