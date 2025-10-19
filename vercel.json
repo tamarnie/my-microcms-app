@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "functions": {
     "api/**/*.js": {
       "maxDuration": 10
@@ -7,12 +9,16 @@
   },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
       "source": "/js/(.*)",
-      "destination": "/public/js/$1"
+      "destination": "/js/$1"
     },
     {
       "source": "/assets/(.*)",
-      "destination": "/public/assets/$1"  
+      "destination": "/assets/$1"
     },
     {
       "source": "/(.*)",
