@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10,
-      "runtime": "nodejs20.x"
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -15,11 +12,11 @@
     },
     {
       "source": "/js/(.*)",
-      "destination": "/js/$1"
+      "destination": "/public/js/$1"
     },
     {
       "source": "/assets/(.*)",
-      "destination": "/assets/$1"
+      "destination": "/public/assets/$1"
     },
     {
       "source": "/(.*)",
