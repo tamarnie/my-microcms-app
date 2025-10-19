@@ -216,9 +216,9 @@ export class UIController {
         announcement.style.position = 'absolute';
         announcement.style.left = '-10000px';
         announcement.textContent = message;
-        
+
         document.body.appendChild(announcement);
-        
+
         // 少し待ってから削除
         setTimeout(() => {
             document.body.removeChild(announcement);
@@ -231,7 +231,7 @@ export class UIController {
     updateScrollState() {
         const currentScrollY = window.pageYOffset;
         const statusBar = utils.getElementById('statusBar');
-        
+
         // スクロール方向を検出
         this.scrollDirection = currentScrollY > this.lastScrollY ? 'down' : 'up';
         this.lastScrollY = currentScrollY;
@@ -240,6 +240,13 @@ export class UIController {
         if (statusBar) {
             const shouldShow = true;  //常に表示
             statusBar.classList.toggle('visible', shouldShow);
+        }
+
+        // ニュースバナーの表示制御
+        if (newsBanner) {
+            const shouldShowBanner = currentScrollY < 100; // 100px以上スクロールしたら非表示
+            newsBanner.style.display = shouldShowBanner ? 'block' : 'none';
+            newsBanner.style.top = '50px'; // 営業状況バーの高さ分下げる
         }
 
         // スクロール進捗の更新
@@ -266,24 +273,24 @@ export class UIController {
     updateActiveNav() {
         const sections = ['news', 'menu', 'access'];
         const navItems = document.querySelectorAll('.nav-item');
-        
+
         const currentSection = sections.find(sectionId => {
             const section = utils.getElementById(sectionId);
             if (!section) return false;
-            
+
             const rect = section.getBoundingClientRect();
             const threshold = window.innerHeight / 2;
-            
+
             return rect.top <= threshold && rect.bottom >= threshold;
         });
 
         if (currentSection !== this.activeSection) {
             this.activeSection = currentSection;
-            
+
             navItems.forEach((item, index) => {
                 const isActive = sections[index] === currentSection;
                 item.classList.toggle('active', isActive);
-                
+
                 // アクセシビリティ用
                 item.setAttribute('aria-current', isActive ? 'page' : 'false');
             });
@@ -311,7 +318,7 @@ export class UIController {
         // レスポンシブ対応の処理
         this.updateActiveNav();
         this.updateScrollProgress();
-        
+
         // モバイル表示の調整
         this.adjustMobileLayout();
     }
@@ -337,7 +344,7 @@ export class UIController {
         }
 
         const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
-        
+
         window.scrollTo({
             top: targetPosition,
             behavior: 'smooth'
@@ -381,7 +388,7 @@ export class UIController {
         const focusableElements = document.querySelectorAll(
             'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
         );
-        
+
         if (focusableElements.length === 0) return;
 
         const firstElement = focusableElements[0];
@@ -440,7 +447,7 @@ export class UIController {
 
         return new Promise((resolve) => {
             element.classList.add(animationClass);
-            
+
             setTimeout(() => {
                 element.classList.remove(animationClass);
                 resolve();
