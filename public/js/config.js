@@ -21,11 +21,11 @@ export const CONFIG = {
         toastDuration: 3000
     },
     business: {
-        openTime: 17.5,        // 17:30
-        closeTime: 22,         // 22:00
-        lastOrderTime: 21.5,   // 21:30
-        closedDay: 3,          // 水曜日 (0=日曜, 1=月曜...)
-        showAdminPanel: true   // 管理者パネル表示（本番環境では false に設定）
+        openTime: 11,        // 11:00
+        closeTime: 21,         // 21:00
+        lastOrderTime: 20.5,   // 20:30
+        closedDay: 1,          // 月曜日 (0=日曜, 1=月曜...)
+        showAdminPanel: false   // 管理者パネル表示（本番環境では false に設定）
     }
 };
 
