@@ -12,7 +12,7 @@ export class BusinessHours {
         this.manualOverride = null;
         this.lastUpdate = null;
         this.lastCMSCheck = null;
-        
+
         // 設定
         this.cmsCheckInterval = 30000; // 30秒間隔
         this.cacheTimeout = 300000; // 5分キャッシュ
@@ -24,13 +24,21 @@ export class BusinessHours {
     async init() {
         // 手動設定をチェック
         await this.checkManualOverride();
-        
+
         // 営業状況を更新
         this.updateStatus();
-        
+
         // 管理者パネルを作成（デバッグモード時）
         if (this.config.showAdminPanel) {
             this.createAdminPanel();
+        }
+
+        // 営業状況バーを強制的に表示
+        const statusBar = document.getElementById('statusBar');
+        if (statusBar) {
+            statusBar.style.display = 'block';
+            statusBar.style.opacity = '1';
+            statusBar.classList.add('visible');
         }
     }
 
@@ -40,7 +48,7 @@ export class BusinessHours {
     async checkManualOverride() {
         try {
             // キャッシュが有効な場合はスキップ
-            if (this.lastCMSCheck && 
+            if (this.lastCMSCheck &&
                 Date.now() - this.lastCMSCheck < this.cacheTimeout) {
                 return;
             }
@@ -52,11 +60,11 @@ export class BusinessHours {
 
                 // 有効な手動設定があるかチェック
                 const activeOverride = this.findActiveOverride(data);
-                
+
                 if (activeOverride !== this.manualOverride) {
                     this.manualOverride = activeOverride;
                     this.updateStatus(); // 即座に状況を更新
-                    
+
                     console.log('Manual override updated:', activeOverride);
                 }
             }
@@ -82,23 +90,23 @@ export class BusinessHours {
         }
 
         const now = new Date();
-        
+
         // 優先度順にソートして最も優先度の高い有効な設定を取得
         const validOverrides = contents
             .filter(item => {
                 // 公開状態チェック
                 if (!item.publishedAt) return false;
-                
+
                 // 開始時刻チェック
                 if (item.startTime && new Date(item.startTime) > now) {
                     return false;
                 }
-                
+
                 // 終了時刻チェック
                 if (item.endTime && new Date(item.endTime) < now) {
                     return false;
                 }
-                
+
                 return true;
             })
             .sort((a, b) => (b.priority || 1) - (a.priority || 1));
@@ -112,7 +120,7 @@ export class BusinessHours {
      */
     updateStatus(customDate = null) {
         const now = customDate || new Date();
-        
+
         // 手動設定が優先
         let status;
         if (this.manualOverride) {
@@ -120,10 +128,10 @@ export class BusinessHours {
         } else {
             status = this.calculateAutoStatus(now);
         }
-        
+
         // 前回と同じ状況なら表示は更新しない
-        if (this.statusCache && 
-            this.statusCache.type === status.type && 
+        if (this.statusCache &&
+            this.statusCache.type === status.type &&
             this.statusCache.message === status.message &&
             this.statusCache.isManual === status.isManual) {
             return;
@@ -132,7 +140,7 @@ export class BusinessHours {
         this.statusCache = status;
         this.lastUpdate = now;
         this.displayStatus(status);
-        
+
         // カスタムイベントを発火
         this.emitStatusChange(status);
     }
@@ -162,7 +170,7 @@ export class BusinessHours {
                     detail: override.reason || '都合により臨時休業',
                     nextMessage: override.message || '営業再開時期は改めてお知らせいたします'
                 };
-                
+
             case 'short':
                 return {
                     ...baseStatus,
@@ -172,7 +180,7 @@ export class BusinessHours {
                     customHours: override.customHours || '営業時間変更',
                     nextMessage: override.message || ''
                 };
-                
+
             case 'special':
                 return {
                     ...baseStatus,
@@ -181,7 +189,7 @@ export class BusinessHours {
                     detail: override.message || '本日は特別営業',
                     specialNote: override.reason || ''
                 };
-                
+
             default:
                 // 不明な設定の場合は自動判定にフォールバック
                 console.warn('Unknown manual status:', override.status);
@@ -289,7 +297,7 @@ export class BusinessHours {
         const icon = icons[status.type] || '⚫';
         badge.className = `status-badge ${status.type}`;
         badge.innerHTML = `${icon} ${status.message}`;
-        
+
         // 手動設定の場合は視覚的に区別
         if (status.isManual) {
             badge.classList.add('manual-override');
@@ -307,7 +315,7 @@ export class BusinessHours {
 
         // 手動設定の場合は追加情報を表示
         this.displayManualInfo(status);
-        
+
         // カウントダウン表示
         this.updateCountdown(status);
     }
@@ -384,7 +392,7 @@ export class BusinessHours {
 
         // イベントリスナーを設定
         this.setupAdminPanelEvents(panel);
-        
+
         // 管理者パネル表示のキーボードショートカット (Ctrl+Shift+A)
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'A') {
@@ -432,7 +440,7 @@ export class BusinessHours {
             const result = await this.clearManualOverride();
             resultDiv.textContent = result.message;
             resultDiv.style.color = result.success ? 'green' : 'red';
-            
+
             // フォームをクリア
             panel.querySelector('#manualStatus').value = '';
             panel.querySelector('#manualReason').value = '';
@@ -449,10 +457,10 @@ export class BusinessHours {
         try {
             if (window.app && window.app.microCMS) {
                 await window.app.microCMS.setBusinessStatus(overrideData);
-                
+
                 // 即座にチェックして反映
                 await this.checkManualOverride();
-                
+
                 return { success: true, message: '手動設定を適用しました' };
             } else {
                 throw new Error('MicroCMS client not available');
@@ -472,7 +480,7 @@ export class BusinessHours {
             // ローカルの手動設定をクリア
             this.manualOverride = null;
             this.updateStatus();
-            
+
             return { success: true, message: '手動設定をクリアしました' };
 
         } catch (error) {
@@ -511,26 +519,26 @@ export class BusinessHours {
 
     getNextOpenTime(currentDate) {
         const nextOpen = new Date(currentDate);
-        
+
         do {
             nextOpen.setDate(nextOpen.getDate() + 1);
         } while (nextOpen.getDay() === this.config.closedDay || this.isHoliday(nextOpen));
-        
+
         const hours = Math.floor(this.config.openTime);
         const minutes = Math.round((this.config.openTime - hours) * 60);
         nextOpen.setHours(hours, minutes, 0, 0);
-        
+
         return nextOpen;
     }
 
     isHoliday(date) {
         const month = date.getMonth() + 1;
         const day = date.getDate();
-        
+
         if ((month === 12 && day >= 29) || (month === 1 && day <= 3)) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -554,7 +562,7 @@ export class BusinessHours {
     }
 
     isOpen(date = new Date()) {
-        const status = this.manualOverride ? 
+        const status = this.manualOverride ?
             this.createManualStatus(this.manualOverride, date) :
             this.calculateAutoStatus(date);
         return status.type === 'open' || status.type === 'last-order' || status.type === 'special';
@@ -562,7 +570,7 @@ export class BusinessHours {
 
     getTodaySchedule(date = new Date()) {
         const day = date.getDay();
-        
+
         if (day === this.config.closedDay || this.isHoliday(date)) {
             return {
                 isOpenDay: false,
