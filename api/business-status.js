@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         }
 
         // ベースURL
-        const baseUrl = `https://${serviceDomain}.microcms.io/api/v1/emergency-status`;
+        const baseUrl = `https://${serviceDomain}.microcms.io/api/v1/business-status`;
         
         // リクエストメソッド別の処理
         switch (req.method) {
