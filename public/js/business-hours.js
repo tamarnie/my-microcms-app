@@ -184,7 +184,6 @@ export class BusinessHours {
                     type: 'emergency-closed',
                     message: '臨時休業',
                     detail: override.reason || '都合により臨時休業',
-                    nextMessage: override.message || '営業再開時期は改めてお知らせいたします'
                 };
 
             case 'short':
@@ -194,7 +193,6 @@ export class BusinessHours {
                     message: '時短営業',
                     detail: override.reason || '本日は時短営業',
                     customHours: override.customHours || '営業時間変更',
-                    nextMessage: override.message || ''
                 };
 
             case 'special':
@@ -208,9 +206,10 @@ export class BusinessHours {
 
             default:
                 // 不明な設定の場合は自動判定にフォールバック
-                console.warn('Unknown manual status:', override.status);
+                console.warn('Unknown manual status:', statusValue);
                 return this.calculateAutoStatus(now);
         }
+        
     }
 
     /**
