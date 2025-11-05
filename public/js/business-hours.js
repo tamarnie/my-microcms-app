@@ -176,7 +176,7 @@ export class BusinessHours {
             startTime: override.startTime,
             endTime: override.endTime
         };
-
+        
         switch (statusValue) {
             case 'closed':
                 return {
@@ -184,6 +184,7 @@ export class BusinessHours {
                     type: 'emergency-closed',
                     message: '臨時休業',
                     detail: override.reason || '都合により臨時休業',
+                    customMessage: override.message || '営業再開時期は改めてお知らせいたします'
                 };
 
             case 'short':
@@ -192,7 +193,8 @@ export class BusinessHours {
                     type: 'short-hours',
                     message: '時短営業',
                     detail: override.reason || '本日は時短営業',
-                    customHours: override.customHours || '営業時間変更',
+                    customMessage: override.message || '',  // customMessageとして設定
+                    customHours: override.customHours || ''
                 };
 
             case 'special':
@@ -209,7 +211,7 @@ export class BusinessHours {
                 console.warn('Unknown manual status:', statusValue);
                 return this.calculateAutoStatus(now);
         }
-        
+
     }
 
     /**
