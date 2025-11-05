@@ -163,7 +163,11 @@ export class BusinessHours {
      * @param {Date} now - 現在時刻
      * @returns {Object} 営業状況オブジェクト
      */
+
     createManualStatus(override, now) {
+        // statusが配列の場合は最初の要素を取得
+        const statusValue = Array.isArray(override.status) ? override.status[0] : override.status;
+
         const baseStatus = {
             isManual: true,
             overrideId: override.id,
@@ -173,7 +177,7 @@ export class BusinessHours {
             endTime: override.endTime
         };
 
-        switch (override.status) {
+        switch (statusValue) {
             case 'closed':
                 return {
                     ...baseStatus,
