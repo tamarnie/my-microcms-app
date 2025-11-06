@@ -22,16 +22,8 @@ export class BusinessHours {
      * 初期化
      */
     async init() {
-        // 手動設定をチェック
-        await this.checkManualOverride(true);
-
-        // 営業状況を更新
+        // まず自動判定で即座に表示
         this.updateStatus();
-
-        // 管理者パネルを作成（デバッグモード時）
-        if (this.config.showAdminPanel) {
-            this.createAdminPanel();
-        }
 
         // 営業状況バーを強制的に表示
         const statusBar = document.getElementById('statusBar');
@@ -41,7 +33,7 @@ export class BusinessHours {
             statusBar.classList.add('visible');
         }
 
-        // ニュースバナーの初期設定（追加）
+        // ニュースバナーの初期設定
         const newsBanner = document.getElementById('newsBanner');
         if (newsBanner) {
             newsBanner.style.display = 'block';
@@ -51,6 +43,19 @@ export class BusinessHours {
             newsBanner.style.zIndex = '999';
             newsBanner.textContent = 'お子様ランチ始めました';
         }
+
+        // 管理者パネルを作成（デバッグモード時）
+        if (this.config.showAdminPanel) {
+            this.createAdminPanel();
+        }
+
+        // バックグラウンドで手動設定をチェック（awaitしない）
+        this.checkManualOverride(true).then(() => {
+            // データ取得後に再度更新
+            this.updateStatus();
+        }).catch(error => {
+            console.warn('Manual override check failed:', error);
+        });
     }
 
 
