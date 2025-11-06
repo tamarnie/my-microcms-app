@@ -23,7 +23,7 @@ export class BusinessHours {
      */
     async init() {
         // 手動設定をチェック
-        await this.checkManualOverride();
+        await this.checkManualOverride(true);
 
         // 営業状況を更新
         this.updateStatus();
@@ -57,10 +57,10 @@ export class BusinessHours {
     /**
      * MicroCMSから手動設定をチェック
      */
-    async checkManualOverride() {
+    async checkManualOverride(forceRefresh = false) {
         try {
-            // キャッシュが有効な場合はスキップ
-            if (this.lastCMSCheck &&
+            // キャッシュチェック（forceRefreshがtrueの場合はスキップ）
+            if (!forceRefresh && this.lastCMSCheck &&
                 Date.now() - this.lastCMSCheck < this.cacheTimeout) {
                 return;
             }
@@ -176,7 +176,7 @@ export class BusinessHours {
             startTime: override.startTime,
             endTime: override.endTime
         };
-        
+
         switch (statusValue) {
             case 'closed':
                 return {
