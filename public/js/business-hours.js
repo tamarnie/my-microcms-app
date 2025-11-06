@@ -22,7 +22,24 @@ export class BusinessHours {
      * 初期化
      */
     async init() {
-        // まず自動判定で即座に表示
+        // LocalStorageから前回の手動設定を読み込み
+        const cachedOverride = localStorage.getItem('manualOverride');
+        if (cachedOverride) {
+            try {
+                this.manualOverride = JSON.parse(cachedOverride);
+                // 有効期限をチェック
+                if (this.manualOverride && this.manualOverride.endTime) {
+                    if (new Date(this.manualOverride.endTime) < new Date()) {
+                        this.manualOverride = null;
+                        localStorage.removeItem('manualOverride');
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to parse cached override:', e);
+            }
+        }
+
+        // 即座に表示（キャッシュがあれば手動設定、なければ自動判定）
         this.updateStatus();
 
         // 営業状況バーを強制的に表示
@@ -49,9 +66,14 @@ export class BusinessHours {
             this.createAdminPanel();
         }
 
-        // バックグラウンドで手動設定をチェック（awaitしない）
+        // バックグラウンドで最新データをチェック
         this.checkManualOverride(true).then(() => {
-            // データ取得後に再度更新
+            // LocalStorageに保存
+            if (this.manualOverride) {
+                localStorage.setItem('manualOverride', JSON.stringify(this.manualOverride));
+            } else {
+                localStorage.removeItem('manualOverride');
+            }
             this.updateStatus();
         }).catch(error => {
             console.warn('Manual override check failed:', error);
@@ -327,7 +349,8 @@ export class BusinessHours {
 
         // 詳細の更新
         let detailText = status.detail;
-        if (status.customMessage) {
+        // specialタイプの場合はcustomMessageを追加しない
+        if (status.type !== 'special' && status.customMessage) {
             detailText += ` - ${status.customMessage}`;
         }
         if (status.nextMessage) {
