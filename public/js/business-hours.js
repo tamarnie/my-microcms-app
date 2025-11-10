@@ -373,21 +373,12 @@ export class BusinessHours {
      * @param {Object} status - 営業状況オブジェクト
      */
     displayManualInfo(status) {
-        const manualInfo = utils.getElementById('manualInfo');
-        if (!manualInfo) return;
-
-        if (status.isManual) {
-            let infoText = '⚠️ 手動設定中';
-            if (status.endTime) {
-                const endTime = new Date(status.endTime);
-                infoText += ` (${endTime.toLocaleDateString()} ${endTime.toLocaleTimeString()}まで)`;
-            }
-            manualInfo.textContent = infoText;
-            manualInfo.style.display = 'block';
-        } else {
-            manualInfo.style.display = 'none';
-        }
-    }
+    const manualInfo = utils.getElementById('manualInfo');
+    if (!manualInfo) return;
+    
+    // 常に非表示にする
+    manualInfo.style.display = 'none';
+}
 
     /**
      * 管理者パネルを作成
