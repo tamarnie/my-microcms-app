@@ -9,13 +9,20 @@ export class BusinessHours {
     constructor() {
         this.config = CONFIG.business;
         this.statusCache = null;
-        this.manualOverride = null;
         this.lastUpdate = null;
         this.lastCMSCheck = null;
 
         // 設定
-        this.cmsCheckInterval = 30000; // 30秒間隔
-        this.cacheTimeout = 300000; // 5分キャッシュ
+        this.cmsCheckInterval = 30000;
+        this.cacheTimeout = 300000;
+
+        // ⭐ デフォルトの手動設定（時短営業）
+        this.manualOverride = {
+            status: ['short'],
+            reason: '台風接近のため',
+            message: '本日は１８：００までの営業となります',
+            endTime: '2025-11-30T23:59:59Z'
+        };
     }
 
     /**
