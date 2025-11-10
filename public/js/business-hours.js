@@ -22,27 +22,25 @@ export class BusinessHours {
      * 初期化
      */
     async init() {
-        // LocalStorageから前回の手動設定を読み込み
-        const cachedOverride = localStorage.getItem('manualOverride');
-        if (cachedOverride) {
-            try {
-                this.manualOverride = JSON.parse(cachedOverride);
-                // 有効期限をチェック
-                if (this.manualOverride && this.manualOverride.endTime) {
-                    if (new Date(this.manualOverride.endTime) < new Date()) {
-                        this.manualOverride = null;
-                        localStorage.removeItem('manualOverride');
-                    }
+        // LocalStorageから前回の設定を即座に読み込み
+        try {
+            const cached = localStorage.getItem('businessOverride');
+            if (cached) {
+                const data = JSON.parse(cached);
+                // 有効期限チェック
+                if (!data.endTime || new Date(data.endTime) > new Date()) {
+                    this.manualOverride = data;
+                    console.log('Using cached override:', this.manualOverride);
                 }
-            } catch (e) {
-                console.warn('Failed to parse cached override:', e);
             }
+        } catch (e) {
+            console.log('No cached override');
         }
 
-        // 即座に表示（キャッシュがあれば手動設定、なければ自動判定）
+        // 即座に現在の状態を表示（キャッシュまたは自動判定）
         this.updateStatus();
 
-        // 営業状況バーを強制的に表示
+        // UIを表示
         const statusBar = document.getElementById('statusBar');
         if (statusBar) {
             statusBar.style.display = 'block';
@@ -50,7 +48,6 @@ export class BusinessHours {
             statusBar.classList.add('visible');
         }
 
-        // ニュースバナーの初期設定
         const newsBanner = document.getElementById('newsBanner');
         if (newsBanner) {
             newsBanner.style.display = 'block';
@@ -61,22 +58,20 @@ export class BusinessHours {
             newsBanner.textContent = 'お子様ランチ始めました';
         }
 
-        // 管理者パネルを作成（デバッグモード時）
         if (this.config.showAdminPanel) {
             this.createAdminPanel();
         }
 
-        // バックグラウンドで最新データをチェック
+        // バックグラウンドで最新データを取得
         this.checkManualOverride(true).then(() => {
-            // LocalStorageに保存
+            // 新しいデータをキャッシュに保存
             if (this.manualOverride) {
-                localStorage.setItem('manualOverride', JSON.stringify(this.manualOverride));
+                localStorage.setItem('businessOverride', JSON.stringify(this.manualOverride));
             } else {
-                localStorage.removeItem('manualOverride');
+                localStorage.removeItem('businessOverride');
             }
+            // データが変わった場合のみ更新
             this.updateStatus();
-        }).catch(error => {
-            console.warn('Manual override check failed:', error);
         });
     }
 
@@ -191,18 +186,18 @@ export class BusinessHours {
      * @returns {Object} 営業状況オブジェクト
      */
 
-   createManualStatus(override, now) {
-    // statusが配列の場合、最初の要素を取得
-    const statusValue = Array.isArray(override.status) ? override.status[0] : override.status;
-    
-    const baseStatus = {
-        isManual: true,
-        overrideId: override.id,
-        reason: override.reason || '',
-        customMessage: override.message || '',
-        startTime: override.startTime,
-        endTime: override.endTime
-    };
+    createManualStatus(override, now) {
+        // statusが配列の場合、最初の要素を取得
+        const statusValue = Array.isArray(override.status) ? override.status[0] : override.status;
+
+        const baseStatus = {
+            isManual: true,
+            overrideId: override.id,
+            reason: override.reason || '',
+            customMessage: override.message || '',
+            startTime: override.startTime,
+            endTime: override.endTime
+        };
 
 
         switch (statusValue) {
