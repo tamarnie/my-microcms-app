@@ -810,30 +810,30 @@ body {
     .menu-slide-image {
         height: 240px;
     }
-    
+
     .menu-slide-content {
         padding: 20px 18px 24px;
     }
-    
+
     .menu-slide-title {
         font-size: 18px;
     }
-    
+
     .menu-slide-price {
         font-size: 18px;
     }
-    
+
     .menu-slide-description {
         font-size: 13px;
         line-height: 1.7;
     }
-    
+
     .mySwiper .swiper-button-next,
     .mySwiper .swiper-button-prev {
         width: 44px;
         height: 44px;
     }
-    
+
     .mySwiper .swiper-button-next:after,
     .mySwiper .swiper-button-prev:after {
         font-size: 18px;
@@ -841,6 +841,7 @@ body {
 }
 
 @media (max-width: 480px) {
+
     .mySwiper .swiper-button-next,
     .mySwiper .swiper-button-prev {
         display: none;
@@ -1192,6 +1193,22 @@ body {
 
     .news-badge {
         align-self: flex-start;
+    }
+
+    .status-detail {
+        display: block !important;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .status-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .status-content {
+        flex-wrap: wrap;
     }
 }
 
