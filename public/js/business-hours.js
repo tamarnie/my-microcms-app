@@ -191,18 +191,19 @@ export class BusinessHours {
      * @returns {Object} 営業状況オブジェクト
      */
 
-    createManualStatus(override, now) {
-        // statusが配列の場合は最初の要素を取得
-        const statusValue = Array.isArray(override.status) ? override.status[0] : override.status;
+   createManualStatus(override, now) {
+    // statusが配列の場合、最初の要素を取得
+    const statusValue = Array.isArray(override.status) ? override.status[0] : override.status;
+    
+    const baseStatus = {
+        isManual: true,
+        overrideId: override.id,
+        reason: override.reason || '',
+        customMessage: override.message || '',
+        startTime: override.startTime,
+        endTime: override.endTime
+    };
 
-        const baseStatus = {
-            isManual: true,
-            overrideId: override.id,
-            reason: override.reason || '',
-            customMessage: override.message || '',
-            startTime: override.startTime,
-            endTime: override.endTime
-        };
 
         switch (statusValue) {
             case 'closed':
