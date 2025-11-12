@@ -15,14 +15,6 @@ export class BusinessHours {
         // 設定
         this.cmsCheckInterval = 30000;
         this.cacheTimeout = 300000;
-
-        // ⭐ デフォルトの手動設定（時短営業）
-        this.manualOverride = {
-            status: ['short'],
-            reason: '台風接近のため',
-            message: '本日は１８：００までの営業となります',
-            endTime: '2025-11-30T23:59:59Z'
-        };
     }
 
     /**
@@ -39,12 +31,24 @@ export class BusinessHours {
                     this.manualOverride = data;
                     console.log('Using cached override:', this.manualOverride);
                 }
+            } else {
+                //  初回訪問時のみ、MicroCMSに設定がある前提でデフォルト値を使用
+                // これにより初回でもラグなし
+                const isFirstVisit = !localStorage.getItem('hasVisited');
+                if (isFirstVisit) {
+                    this.manualOverride = {
+                        status: ['short'],
+                        reason: '台風接近のため',
+                        message: '本日は１８：００までの営業となります'
+                    };
+                    localStorage.setItem('hasVisited', 'true');
+                }
             }
         } catch (e) {
             console.log('No cached override');
         }
 
-        // 即座に現在の状態を表示（キャッシュまたは自動判定）
+        // 即座に現在の状態を表示
         this.updateStatus();
 
         // UIを表示
@@ -373,12 +377,12 @@ export class BusinessHours {
      * @param {Object} status - 営業状況オブジェクト
      */
     displayManualInfo(status) {
-    const manualInfo = utils.getElementById('manualInfo');
-    if (!manualInfo) return;
-    
-    // 常に非表示にする
-    manualInfo.style.display = 'none';
-}
+        const manualInfo = utils.getElementById('manualInfo');
+        if (!manualInfo) return;
+
+        // 常に非表示にする
+        manualInfo.style.display = 'none';
+    }
 
     /**
      * 管理者パネルを作成
