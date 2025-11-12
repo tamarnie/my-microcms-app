@@ -1196,19 +1196,37 @@ body {
     }
 
     .status-detail {
-        display: block !important;
-        font-size: 12px;
-        margin-top: 4px;
+        display: inline !important;
+        font-size: 11px;
+        line-height: 1.4;
+        margin: 0;
+        flex: 1;
     }
 
     .status-info {
         display: flex;
-        flex-direction: column;
-        gap: 4px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .status-badge {
+        font-size: 13px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .status-content {
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .status-action {
+        width: 100%;
+        text-align: center;
+        padding: 6px;
+        font-size: 13px;
     }
 }
 
