@@ -92,7 +92,7 @@ export class BusinessHours {
      */
     async checkManualOverride(forceRefresh = false) {
         try {
-            // キャッシュチェック（forceRefreshがtrueの場合はスキップ）
+            // キャッシュチェック
             if (!forceRefresh && this.lastCMSCheck &&
                 Date.now() - this.lastCMSCheck < this.cacheTimeout) {
                 return;
@@ -108,15 +108,25 @@ export class BusinessHours {
 
                 if (activeOverride !== this.manualOverride) {
                     this.manualOverride = activeOverride;
-                    this.updateStatus(); // 即座に状況を更新
 
+                    // LocalStorageの更新
+                    if (activeOverride) {
+                        localStorage.setItem('businessOverride', JSON.stringify(activeOverride));
+                        console.log('✅ Saved to LocalStorage:', activeOverride);
+                    } else {
+                        // データがない場合は必ずLocalStorageをクリア
+                        localStorage.removeItem('businessOverride');
+                        console.log('🗑️ Cleared LocalStorage (no data)');
+                    }
+
+                    this.updateStatus();
                     console.log('Manual override updated:', activeOverride);
                 }
             }
-
         } catch (error) {
-            console.warn('MicroCMS接続エラー、通常判定継続:', error.message);
-            // エラー時は手動設定をクリア（安全側に倒す）
+            console.warn('MicroCMS接続エラー:', error.message);
+            // エラー時もLocalStorageをクリア
+            localStorage.removeItem('businessOverride');
             if (this.manualOverride) {
                 this.manualOverride = null;
                 this.updateStatus();
