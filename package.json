@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "mkdir -p dist && cp index.html dist/ && cp -r public/* dist/",
+    "prebuild": "node scripts/prebuild.js",
+    "build": "npm run prebuild && mkdir -p dist && cp index.html dist/ && cp -r public/* dist/",
     "deploy": "vercel --prod",
     "health-check": "node scripts/health-check.js"
   },
