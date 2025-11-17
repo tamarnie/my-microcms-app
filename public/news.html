@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新着情報 | 旬彩ダイニング はなれ</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/news.css">
+</head>
+<body>
+    <!-- ヘッダー（index.htmlと同じ） -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">旬彩ダイニング はなれ</a>
+                <ul class="nav-menu">
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/news.html" class="active">新着情報</a></li>
+                    <li><a href="/#menu">メニュー</a></li>
+                    <li><a href="/#access">アクセス</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 営業状況バー -->
+    <div id="statusBar" class="status-bar">
+        <div class="status-content">
+            <div class="status-info">
+                <span id="statusBadge" class="status-badge"></span>
+                <span id="statusDetail" class="status-detail"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <main class="news-page">
+        <div class="container">
+            <h1 class="page-title">新着情報</h1>
+            
+            <!-- カテゴリフィルター -->
+            <div class="news-filters">
+                <button class="filter-btn active" data-category="all">すべて</button>
+                <button class="filter-btn" data-category="news">お知らせ</button>
+                <button class="filter-btn" data-category="event">イベント</button>
+                <button class="filter-btn" data-category="menu">メニュー</button>
+            </div>
+
+            <!-- ニュースリスト -->
+            <div id="newsList" class="news-list">
+                <div class="loading">読み込み中...</div>
+            </div>
+
+            <!-- ページネーション -->
+            <div id="pagination" class="pagination"></div>
+        </div>
+    </main>
+
+    <!-- フッター -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 旬彩ダイニング はなれ</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script type="module">
+        import { NewsPage } from '/js/news-page.js';
+        const newsPage = new NewsPage();
+        newsPage.init();
+    </script>
+</body>
+</html>

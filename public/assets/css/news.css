@@ -1,0 +1,145 @@
+/* 新着情報ページ専用スタイル */
+.news-page {
+    padding: 80px 0 40px;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+/* フィルター */
+.news-filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    border-color: #B8860B;
+}
+
+.filter-btn.active {
+    background: #B8860B;
+    color: white;
+    border-color: #B8860B;
+}
+
+/* ニュースリスト */
+.news-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.news-item {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 20px;
+}
+
+.news-date {
+    min-width: 100px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.news-content {
+    flex: 1;
+}
+
+.news-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.news-title {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.news-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.news-title a:hover {
+    color: #B8860B;
+}
+
+.news-excerpt {
+    color: #666;
+    line-height: 1.6;
+}
+
+.news-image {
+    margin-top: 10px;
+}
+
+.news-image img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* ページネーション */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 40px;
+}
+
+.page-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.page-btn:hover {
+    background: #f0f0f0;
+}
+
+.page-btn.active {
+    background: #B8860B;
+    color: white;
+    border-color: #B8860B;
+}
+
+.page-dots {
+    padding: 8px 4px;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    .news-item {
+        flex-direction: column;
+    }
+    
+    .news-date {
+        min-width: auto;
+    }
+}
