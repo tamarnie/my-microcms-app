@@ -21,37 +21,89 @@ export class BusinessHours {
      * 初期化
      */
     async init() {
-        // LocalStorageから前回の設定を即座に読み込み
+        // STEP1: プリレンダリングされたキャッシュを即座に読み込み
         try {
-            const cached = localStorage.getItem('businessOverride');
-            if (cached) {
-                const data = JSON.parse(cached);
-                // 有効期限チェック
-                if (!data.endTime || new Date(data.endTime) > new Date()) {
-                    this.manualOverride = data;
-                    console.log('Using cached override:', this.manualOverride);
-                }
-            } else {
-                //  初回訪問時のみ、MicroCMSに設定がある前提でデフォルト値を使用
-                // これにより初回でもラグなし
-                const isFirstVisit = !localStorage.getItem('hasVisited');
-                if (isFirstVisit) {
-                    this.manualOverride = {
-                        status: ['short'],
-                        reason: '台風接近のため',
-                        message: '本日は１８：００までの営業となります'
-                    };
-                    localStorage.setItem('hasVisited', 'true');
+            const cacheResponse = await fetch('/data/business-status-cache.json');
+            if (cacheResponse.ok) {
+                const cacheData = await cacheResponse.json();
+
+                // キャッシュが5分以内なら使用
+                const cacheAge = Date.now() - new Date(cacheData.fetchedAt).getTime();
+                if (cacheAge < 5 * 60 * 1000 && cacheData.contents) {
+                    const activeOverride = this.findActiveOverride(cacheData.contents);
+                    if (activeOverride) {
+                        this.manualOverride = activeOverride;
+                        console.log('📦 Using pre-rendered cache');
+                    }
                 }
             }
         } catch (e) {
-            console.log('No cached override');
+            console.log('No pre-rendered cache available');
         }
 
-        // 即座に現在の状態を表示
-        this.updateStatus();
+        // STEP2: LocalStorageもチェック（フォールバック）
+        if (!this.manualOverride) {
+            try {
+                const cached = localStorage.getItem('businessOverride');
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (!data.endTime || new Date(data.endTime) > new Date()) {
+                        this.manualOverride = data;
+                        console.log('💾 Using localStorage cache');
+                    }
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
 
-        // UIを表示
+        // STEP3: 即座に表示（キャッシュがあれば手動設定、なければ自動判定）
+        this.updateStatus();
+        this.displayUI();
+
+        // STEP4: 管理者パネル（既存の機能を維持）
+        if (this.config.showAdminPanel) {
+            this.createAdminPanel();
+        }
+
+        // STEP5: バックグラウンドで最新データを取得（非ブロッキング）
+        this.refreshInBackground();
+    }
+    /**
+     * バックグラウンドで最新データを更新
+     */
+    async refreshInBackground() {
+        // 100ms待ってから最新データ取得（UIを優先）
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        try {
+            // 既存のcheckManualOverrideを使用
+            await this.checkManualOverride(true);
+        } catch (error) {
+            console.warn('Background refresh failed:', error);
+        }
+    }
+
+    /**
+     * スムーズな更新アニメーション
+     */
+    smoothUpdate() {
+        const statusBar = document.getElementById('statusBar');
+        if (statusBar) {
+            statusBar.style.transition = 'opacity 0.3s';
+            statusBar.style.opacity = '0.7';
+
+            setTimeout(() => {
+                this.updateStatus();
+                statusBar.style.opacity = '1';
+            }, 150);
+        }
+    }
+
+    /**
+     * UI要素の表示
+     */
+    displayUI() {
         const statusBar = document.getElementById('statusBar');
         if (statusBar) {
             statusBar.style.display = 'block';
@@ -68,24 +120,7 @@ export class BusinessHours {
             newsBanner.style.zIndex = '999';
             newsBanner.textContent = 'お子様ランチ始めました';
         }
-
-        if (this.config.showAdminPanel) {
-            this.createAdminPanel();
-        }
-
-        // バックグラウンドで最新データを取得
-        this.checkManualOverride(true).then(() => {
-            // 新しいデータをキャッシュに保存
-            if (this.manualOverride) {
-                localStorage.setItem('businessOverride', JSON.stringify(this.manualOverride));
-            } else {
-                localStorage.removeItem('businessOverride');
-            }
-            // データが変わった場合のみ更新
-            this.updateStatus();
-        });
     }
-
 
     /**
      * MicroCMSから手動設定をチェック
