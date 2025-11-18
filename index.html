@@ -82,7 +82,7 @@
     <!-- 新着情報表示バナー最新1件のみ表示　-->
     <div class="news-banner" id="newsBanner">
         読み込み中...
-    </div> 
+    </div>
 
     <!-- ヒーロー -->
     <section class="hero">
@@ -99,9 +99,12 @@
         <div class="news-container">
             <div class="news-header">
                 <h2 class="news-title">新着情報</h2>
-               <!-- <span class="news-date" id="lastUpdate">更新中...</span> -->
+                <a href="/news.html" class="news-more-link">すべて見る →</a>
             </div>
-
+            <!--  スマホ用のボタンも追加 -->
+            <div class="news-footer">
+                <a href="/news.html" class="btn btn-primary">新着情報をもっと見る</a>
+            </div>
             <!-- ローディング状態-->
             <div class="news-loading" id="newsLoading">
                 <div class="spinner"></div>
@@ -179,7 +182,8 @@
             </div>
             <div class="quick-card">
                 <p class="quick-label">ご予算</p>
-                <p class="quick-value">¥1,500<p>
+                <p class="quick-value">¥1,500
+                <p>
             </div>
         </div>
         </div>
@@ -225,49 +229,49 @@
         </div>
     </section>
 
-  
+
 
     <!-- メニューギャラリー -->
-<section class="top_menu">
-    <div class="swiper mySwiper">
-        <div class="swiper-wrapper">
-            
-            <div class="swiper-slide">
-                <div class="slide-background" style="background-image: url('/assets/img/dish1.png');"></div>
-                <div class="menu-slide-card">
-                    <img src="/assets/img/dish1.png" alt="三州豚と旬野菜のグリルプレート" class="menu-slide-image">
-                    <div class="menu-slide-content">
-                        <h3 class="menu-slide-title">三州豚と旬野菜のグリルプレート</h3>
-                        <p class="menu-slide-price">¥1,200</p>
-                        <p class="menu-slide-description">
-                            地元農家さんから届いた新鮮な野菜と、旨みたっぷりの三州豚を一皿にぎゅっと詰め込みました。家庭的な温かさの中に、特別感を添えたおすすめのプレートです。
-                        </p>
+    <section class="top_menu">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+
+                <div class="swiper-slide">
+                    <div class="slide-background" style="background-image: url('/assets/img/dish1.png');"></div>
+                    <div class="menu-slide-card">
+                        <img src="/assets/img/dish1.png" alt="三州豚と旬野菜のグリルプレート" class="menu-slide-image">
+                        <div class="menu-slide-content">
+                            <h3 class="menu-slide-title">三州豚と旬野菜のグリルプレート</h3>
+                            <p class="menu-slide-price">¥1,200</p>
+                            <p class="menu-slide-description">
+                                地元農家さんから届いた新鮮な野菜と、旨みたっぷりの三州豚を一皿にぎゅっと詰め込みました。家庭的な温かさの中に、特別感を添えたおすすめのプレートです。
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="swiper-slide">
-                <div class="slide-background" style="background-image: url('/assets/img/dish1.png');"></div>
-                <div class="menu-slide-card">
-                    <img src="/assets/img/dish1.png" alt="季節の刺身盛り合わせ" class="menu-slide-image">
-                    <div class="menu-slide-content">
-                        <h3 class="menu-slide-title">季節の刺身盛り合わせ</h3>
-                        <p class="menu-slide-price">¥1,480</p>
-                        <p class="menu-slide-description">
-                            その日の朝に仕入れた鮮度抜群の魚介を、丁寧に盛り付けました。季節ごとに変わる旬の味わいをお楽しみください。
-                        </p>
+                <div class="swiper-slide">
+                    <div class="slide-background" style="background-image: url('/assets/img/dish1.png');"></div>
+                    <div class="menu-slide-card">
+                        <img src="/assets/img/dish1.png" alt="季節の刺身盛り合わせ" class="menu-slide-image">
+                        <div class="menu-slide-content">
+                            <h3 class="menu-slide-title">季節の刺身盛り合わせ</h3>
+                            <p class="menu-slide-price">¥1,480</p>
+                            <p class="menu-slide-description">
+                                その日の朝に仕入れた鮮度抜群の魚介を、丁寧に盛り付けました。季節ごとに変わる旬の味わいをお楽しみください。
+                            </p>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
         </div>
-        
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-pagination"></div>
-    </div>
-</section>
- 
+    </section>
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
     <script type="module" src="/js/main.js"></script>
 
@@ -400,7 +404,8 @@
                     onclick="showToast('Instagram: @torimaru_nagoya')">📷</a>
                 <a href="#" class="social-link" aria-label="Twitter"
                     onclick="showToast('Twitter: @torimaru_nagoya')">🐦</a>
-                <a href="#" class="social-link" aria-label="Facebook" onclick="showToast('Facebook: 旬彩ダイニング　はなれ')">📘</a>
+                <a href="#" class="social-link" aria-label="Facebook"
+                    onclick="showToast('Facebook: 旬彩ダイニング　はなれ')">📘</a>
                 <a href="#" class="social-link" aria-label="LINE" onclick="showToast('LINE予約は準備中です')">💬</a>
             </div>
             <div class="footer-links">
@@ -415,7 +420,7 @@
     <!-- 下部固定ナビゲーション モバイル　-->
     <nav class="bottom-nav" role="navigation">
         <div class="nav-content">
-            <a href="#news" class="nav-item active" aria-label="新着情報" onclick="scrollToSection('news')">
+            <a href="/news.html" class="nav-item active" aria-label="新着情報" onclick="scrollToSection('news')">
                 <span class="nav-icon">NEW</span>
                 <span>最新</span>
             </a>

@@ -187,6 +187,59 @@ body {
 }
 
 
+/* 新着情報セクションのリンクスタイル */
+
+.news-more-link {
+    color: #B8860B;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+
+.news-more-link:hover {
+    color: #996f00;
+    text-decoration: underline;
+}
+
+.news-footer {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.news-footer .btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #B8860B;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s;
+}
+
+.news-footer .btn:hover {
+    background: #996f00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* モバイルで新着情報ボタンを表示 */
+@media (max-width: 768px) {
+    .news-more-link {
+        display: none;
+    }
+    
+    .news-footer {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .news-footer {
+        display: none;
+    }
+}
+
+
 /* ヒーローセクション */
 .hero {
     height: 100vh;
