@@ -53,13 +53,13 @@ export class MicroCMSClient {
                     signal: this.abortController.signal
                 }
             );
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const data = await response.json();
-            
+
             // データ検証
             if (!data.contents || !Array.isArray(data.contents)) {
                 throw new Error('Invalid data format received');
@@ -73,7 +73,7 @@ export class MicroCMSClient {
 
             this.renderNews(data.contents);
             this.retryCount = 0; // リセット
-            
+
             return data.contents;
 
         } catch (error) {
@@ -104,7 +104,7 @@ export class MicroCMSClient {
             }
 
             const response = await this.fetchWithRetry(CONFIG.microcms.businessStatusEndpoint);
-            
+
             if (!response.ok) {
                 // 404エラーの場合は空の配列を返す（設定がない場合）
                 if (response.status === 404) {
@@ -115,7 +115,7 @@ export class MicroCMSClient {
             }
 
             const data = await response.json();
-            
+
             // データ検証
             if (!data.contents || !Array.isArray(data.contents)) {
                 console.warn('Invalid business status data format, using empty array');
@@ -262,14 +262,14 @@ export class MicroCMSClient {
     async clearAllBusinessStatus() {
         try {
             const statusList = await this.loadBusinessStatus(true);
-            
+
             if (statusList.length === 0) {
                 console.log('No business status to clear');
                 return true;
             }
 
             // 全ての営業状況を削除
-            const deletePromises = statusList.map(status => 
+            const deletePromises = statusList.map(status =>
                 this.deleteBusinessStatus(status.id).catch(error => {
                     console.warn(`Failed to delete status ${status.id}:`, error);
                     return false;
@@ -296,16 +296,16 @@ export class MicroCMSClient {
         try {
             const endpoint = CONFIG.microcms.endpoint.replace('/news', '/menu');
             const url = category === 'all' ? endpoint : `${endpoint}?category=${category}`;
-            
+
             const response = await this.fetchWithRetry(url);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const data = await response.json();
             return data.contents || [];
-            
+
         } catch (error) {
             console.error('Menu load error:', error);
             throw error;
@@ -319,7 +319,7 @@ export class MicroCMSClient {
      */
     async fetchWithRetry(url, options = {}) {
         let lastError;
-        
+
         for (let i = 0; i <= this.maxRetries; i++) {
             try {
                 const response = await fetch(url, {
@@ -329,12 +329,12 @@ export class MicroCMSClient {
                         ...options.headers
                     }
                 });
-                
+
                 return response;
-                
+
             } catch (error) {
                 lastError = error;
-                
+
                 if (i < this.maxRetries && error.name !== 'AbortError') {
                     // 指数バックオフで再試行
                     const delay = Math.pow(2, i) * 1000;
@@ -345,7 +345,7 @@ export class MicroCMSClient {
                 }
             }
         }
-        
+
         throw lastError;
     }
 
@@ -356,7 +356,7 @@ export class MicroCMSClient {
      */
     async handleError(error, showLoading) {
         console.error('MicroCMS Error:', error);
-        
+
         if (CONFIG.microcms.fallbackEnabled) {
             this.showFallback();
         } else {
@@ -384,7 +384,7 @@ export class MicroCMSClient {
         // 最新3件のみ表示
         const latestNews = newsItems.slice(0, CONFIG.microcms.limit);
         container.innerHTML = latestNews.map(item => this.createNewsHTML(item)).join('');
-        
+
         // バナー更新
         if (latestNews[0]) {
             this.updateBanner(latestNews[0]);
@@ -402,11 +402,11 @@ export class MicroCMSClient {
         const date = utils.formatDate(item.publishedAt);
         const categoryName = this.getCategoryName(item.category);
         const badgeClass = this.getBadgeClass(item.category);
-        
+
         // HTMLエスケープ
         const title = utils.sanitizeHtml(item.title);
         const content = utils.sanitizeHtml(item.description || item.content || '');
-        
+
         return `
             <article class="news-item" data-id="${item.id}">
                 <div class="news-badge ${badgeClass}">${categoryName}</div>
@@ -441,14 +441,8 @@ export class MicroCMSClient {
      * @param {Event} event - クリックイベント
      */
     handleNewsItemClick(newsId, event) {
-        // 詳細表示やモーダル表示の処理
-        console.log('News item clicked:', newsId);
-        
-        // 必要に応じてカスタムイベントを発火
-        const customEvent = new CustomEvent('newsItemClick', {
-            detail: { newsId, originalEvent: event }
-        });
-        document.dispatchEvent(customEvent);
+        // 新着情報ページへ遷移
+        window.location.href = '/news.html';
     }
 
     /**
@@ -497,7 +491,7 @@ export class MicroCMSClient {
     showLoading() {
         const loading = utils.getElementById('newsLoading');
         const grid = utils.getElementById('newsGrid');
-        
+
         if (loading) loading.style.display = 'flex';
         if (grid) grid.style.display = 'none';
     }
@@ -508,7 +502,7 @@ export class MicroCMSClient {
     hideLoading() {
         const loading = utils.getElementById('newsLoading');
         const grid = utils.getElementById('newsGrid');
-        
+
         if (loading) loading.style.display = 'none';
         if (grid) grid.style.display = 'grid';
     }
@@ -519,7 +513,7 @@ export class MicroCMSClient {
     showFallback() {
         const fallback = utils.getElementById('fallbackNews');
         const grid = utils.getElementById('newsGrid');
-        
+
         if (fallback) fallback.style.display = 'grid';
         if (grid) grid.style.display = 'none';
     }
@@ -628,7 +622,7 @@ export class MicroCMSClient {
         for (const [key, value] of this.cache) {
             const age = Date.now() - value.timestamp;
             const dataSize = JSON.stringify(value.data).length;
-            
+
             stats.entries.push({
                 key,
                 age: Math.round(age / 1000), // 秒単位
@@ -646,7 +640,7 @@ export class MicroCMSClient {
     async getBusinessStatusStats() {
         try {
             const statusList = await this.loadBusinessStatus();
-            
+
             const stats = {
                 total: statusList.length,
                 active: 0,
@@ -664,7 +658,7 @@ export class MicroCMSClient {
 
                 // アクティブ/期限切れ判定
                 const isActive = utils.isBusinessStatusActive(status, now);
-                
+
                 if (isActive) {
                     stats.active++;
                 } else {
@@ -704,7 +698,7 @@ export class MicroCMSClient {
         }
 
         const results = [];
-        
+
         for (const statusData of statusDataArray) {
             try {
                 const result = await this.setBusinessStatus(statusData);
@@ -731,17 +725,17 @@ export class MicroCMSClient {
         console.log('Retry count:', this.retryCount);
         console.log('Max retries:', this.maxRetries);
         console.log('Cache stats:', this.getCacheStats());
-        
+
         // 営業状況統計を非同期で表示
         this.getBusinessStatusStats().then(stats => {
             console.log('Business status stats:', stats);
         });
-        
+
         // 健康状態チェック
         this.healthCheck().then(health => {
             console.log('Health check:', health);
         });
-        
+
         console.groupEnd();
     }
 }
