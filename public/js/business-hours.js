@@ -119,6 +119,8 @@ export class BusinessHours {
             newsBanner.style.width = '100%';
             newsBanner.style.zIndex = '999';
             newsBanner.textContent = 'お子様ランチ始めました';
+            newsBanner.style.cursor = 'pointer';
+            newsBanner.onclick = () => window.location.href = '/news.html';
         }
     }
 
