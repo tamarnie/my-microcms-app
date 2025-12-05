@@ -91,7 +91,7 @@ export class NewsPage {
                             ${this.getCategoryLabel(item.category)}
                         </span>
                         <h2 class="news-title">
-                            <a href="/news/${item.id}">
+                            <a href="#" class="news-link" data-id="${item.id}">
                                 ${item.title}
                             </a>
                         </h2>
