@@ -11,6 +11,7 @@ export class NewsPage {
     async init() {
         await this.loadNews();
         this.setupFilters();
+        this.setupModal();
         this.render();
     }
 
@@ -33,7 +34,7 @@ export class NewsPage {
                 // アクティブクラスの切り替え
                 filterBtns.forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                
+
                 // カテゴリ変更
                 this.currentCategory = e.target.dataset.category;
                 this.currentPage = 1;
@@ -46,7 +47,7 @@ export class NewsPage {
         if (this.currentCategory === 'all') {
             return this.newsData;
         }
-        return this.newsData.filter(item => 
+        return this.newsData.filter(item =>
             item.category === this.currentCategory
         );
     }
@@ -54,7 +55,7 @@ export class NewsPage {
     render() {
         const filteredNews = this.getFilteredNews();
         const totalPages = Math.ceil(filteredNews.length / this.itemsPerPage);
-        
+
         // ページネーション計算
         const startIndex = (this.currentPage - 1) * this.itemsPerPage;
         const endIndex = startIndex + this.itemsPerPage;
@@ -62,14 +63,14 @@ export class NewsPage {
 
         // ニュースリスト表示
         this.renderNewsList(pageNews);
-        
+
         // ページネーション表示
         this.renderPagination(totalPages);
     }
 
     renderNewsList(newsItems) {
         const container = document.getElementById('newsList');
-        
+
         if (newsItems.length === 0) {
             container.innerHTML = `
                 <div class="no-news">
@@ -106,18 +107,106 @@ export class NewsPage {
                 </div>
             </article>
         `).join('');
+
+        this.attachArticleEvents();
+    }
+
+
+
+
+    // 新しいメソッドを追加
+    setupModal() {
+        // モーダル用のHTMLを追加
+        const modalHTML = `
+            <div id="newsModal" class="news-modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <div class="modal-header">
+                        <span id="modalCategory" class="news-badge"></span>
+                        <h2 id="modalTitle"></h2>
+                        <div id="modalDate" class="modal-date"></div>
+                    </div>
+                    <div id="modalImage" class="modal-image"></div>
+                    <div id="modalBody" class="modal-body"></div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // 閉じるボタンのイベント
+        const modal = document.getElementById('newsModal');
+        const closeBtn = modal.querySelector('.modal-close');
+
+        closeBtn.addEventListener('click', () => this.closeModal());
+
+        // モーダル外クリックで閉じる
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeModal();
+            }
+        });
+    }
+
+    attachArticleEvents() {
+        const links = document.querySelectorAll('.news-link');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const articleId = e.target.dataset.id;
+                this.showArticle(articleId);
+            });
+        });
+    }
+
+    showArticle(articleId) {
+        const article = this.newsData.find(item => item.id === articleId);
+        if (!article) return;
+
+        const modal = document.getElementById('newsModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalDate = document.getElementById('modalDate');
+        const modalImage = document.getElementById('modalImage');
+        const modalBody = document.getElementById('modalBody');
+
+        // モーダルに内容を設定
+        modalTitle.textContent = article.title;
+        modalCategory.textContent = this.getCategoryLabel(article.category);
+        modalCategory.className = `news-badge ${article.category || 'news'}`;
+        modalDate.textContent = this.formatDate(article.publishedAt || article.createdAt);
+
+        // 画像があれば表示
+        if (article.image) {
+            modalImage.innerHTML = `<img src="${article.image.url}?w=800" alt="${article.title}">`;
+            modalImage.style.display = 'block';
+        } else {
+            modalImage.style.display = 'none';
+        }
+
+        // 本文を表示
+        modalBody.innerHTML = article.content || article.description || '';
+
+        // モーダルを表示
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // スクロール防止
+    }
+
+    closeModal() {
+        const modal = document.getElementById('newsModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // スクロール復活
     }
 
     renderPagination(totalPages) {
         const container = document.getElementById('pagination');
-        
+
         if (totalPages <= 1) {
             container.innerHTML = '';
             return;
         }
 
         let paginationHTML = '';
-        
+
         // 前へボタン
         if (this.currentPage > 1) {
             paginationHTML += `
@@ -130,8 +219,8 @@ export class NewsPage {
         // ページ番号
         for (let i = 1; i <= totalPages; i++) {
             if (
-                i === 1 || 
-                i === totalPages || 
+                i === 1 ||
+                i === totalPages ||
                 (i >= this.currentPage - 2 && i <= this.currentPage + 2)
             ) {
                 paginationHTML += `
@@ -141,7 +230,7 @@ export class NewsPage {
                     </button>
                 `;
             } else if (
-                i === this.currentPage - 3 || 
+                i === this.currentPage - 3 ||
                 i === this.currentPage + 3
             ) {
                 paginationHTML += '<span class="page-dots">...</span>';
