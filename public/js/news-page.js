@@ -97,7 +97,7 @@ export class NewsPage {
                         </h2>
                     </div>
                     <div class="news-excerpt">
-                        ${item.excerpt || item.content?.substring(0, 100) || ''}...
+                        ${this.decodeHTMLEntities(item.excerpt || item.content?.substring(0, 100) || '')}...
                     </div>
                     ${item.image ? `
                         <div class="news-image">
