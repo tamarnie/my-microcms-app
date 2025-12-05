@@ -183,12 +183,22 @@ export class NewsPage {
             modalImage.style.display = 'none';
         }
 
-        // 本文を表示
-        modalBody.innerHTML = article.content || article.description || '';
+        // 本文を表示（HTMLデコード処理を追加）
+        const content = article.content || article.description || '';
+        // HTMLエンティティをデコード
+        const decodedContent = this.decodeHTMLEntities(content);
+        modalBody.innerHTML = decodedContent;
 
         // モーダルを表示
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden'; // スクロール防止
+    }
+
+    // HTMLエンティティをデコードする
+    decodeHTMLEntities(text) {
+        const textArea = document.createElement('textarea');
+        textArea.innerHTML = text;
+        return textArea.value;
     }
 
     closeModal() {
